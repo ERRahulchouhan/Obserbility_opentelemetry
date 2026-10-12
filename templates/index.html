@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6f2">
+  <title>Trace Studio | LLM Playground</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Trace Studio home">
+      <span class="brand-mark" aria-hidden="true">t.</span>
+      <span>trace studio</span>
+    </a>
+    <div class="topbar-right">
+      <a class="jaeger-link" href="/methods" rel="noreferrer">Open methods demo</a>
+      <span class="connection"><span class="connection-dot"></span>LOCAL STACK</span>
+      <a class="jaeger-link" href="http://localhost:16686" target="_blank" rel="noreferrer">Open Jaeger <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="chat-panel" aria-labelledby="page-title">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">PLAYGROUND <span> / </span> CHAT</p>
+          <h1 id="page-title">LLM trace playground</h1>
+        </div>
+        <span class="model-tag"><span class="model-dot"></span> mock-llm</span>
+      </div>
+
+      <div class="conversation" id="messages" aria-live="polite" aria-label="Conversation">
+        <div class="welcome-message">
+          <span class="welcome-mark" aria-hidden="true">✳</span>
+          <p>Ready for a prompt.</p>
+          <span>Responses are simulated. Traces are real.</span>
+        </div>
+      </div>
+
+      <form class="composer" id="chat-form">
+        <label class="sr-only" for="prompt-input">Your prompt</label>
+        <textarea id="prompt-input" name="prompt" rows="2" maxlength="2000" placeholder="Ask something..." required></textarea>
+        <div class="composer-footer">
+          <span class="key-hint">Enter to send <span>·</span> Shift + Enter for a new line</span>
+          <button class="send-button" id="send-button" type="submit">Send <span aria-hidden="true">↗</span></button>
+        </div>
+      </form>
+      <div class="chat-footer"><span>SIMULATED MODEL</span><span>NO API KEY REQUIRED</span></div>
+    </section>
+
+    <aside class="trace-panel" aria-labelledby="trace-title">
+      <div class="trace-heading">
+        <div>
+          <p class="eyebrow">OBSERVABILITY</p>
+          <h2 id="trace-title">Trace map</h2>
+        </div>
+        <span class="trace-indicator" id="trace-status">IDLE</span>
+      </div>
+
+      <div class="tree-wrap" aria-label="Span hierarchy">
+        <div class="tree-root"><span class="span-icon root-icon"></span><span>chat.request</span><span class="tree-kind">SERVER</span></div>
+        <div class="tree-branch">
+          <div class="tree-node"><span class="span-icon invoke-icon"></span><span>llm.invoke</span><span class="tree-kind">INTERNAL</span></div>
+          <div class="tree-leaves">
+            <div class="tree-node"><span class="span-icon prompt-icon"></span><span>prompt.prepare</span></div>
+            <div class="tree-node"><span class="span-icon generate-icon"></span><span>llm.generate</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trace-section-heading">
+        <h3>Recent traces</h3>
+        <span class="trace-count" id="trace-count">0</span>
+      </div>
+      <div class="trace-list" id="trace-list">
+        <p class="empty-traces" id="empty-traces">Your traces will appear here.</p>
+      </div>
+      <div class="trace-note"><span class="note-mark">i</span><span>Select a trace to inspect its spans and attributes in Jaeger.</span></div>
+    </aside>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

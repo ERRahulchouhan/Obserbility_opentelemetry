@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenTelemetry Methods Demo</title>
+  <style>
+    :root {
+      --bg: #f3f6f3;
+      --panel: #ffffff;
+      --text: #1f2d2b;
+      --muted: #61706a;
+      --line: #dfe8e1;
+      --green: #16765a;
+      --green-dark: #0f5847;
+      --green-soft: #eaf5ef;
+      --blue: #3c7ab7;
+      --orange: #d38a3d;
+      --red: #b5483f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .container {
+      max-width: 1100px;
+      margin: 32px auto;
+      padding: 20px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+    .link-btn {
+      display: inline-block;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--green-soft);
+      color: var(--green-dark);
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 8px 30px rgba(17, 30, 21, 0.04);
+    }
+    .sidebar {
+      padding: 20px;
+    }
+    .methods {
+      display: grid;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .method-btn {
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.96rem;
+      font-weight: 600;
+    }
+    .method-btn:hover {
+      border-color: var(--green);
+      background: var(--green-soft);
+    }
+    .method-btn.primary {
+      background: var(--green);
+      color: white;
+      border-color: var(--green);
+    }
+    .content {
+      padding: 20px;
+    }
+    .result-box {
+      min-height: 220px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fafcfb;
+      padding: 18px;
+    }
+    .status {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      background: var(--green-soft);
+      color: var(--green-dark);
+    }
+    .status.error {
+      background: #fdeae8;
+      color: var(--red);
+    }
+    .trace-id {
+      font-family: Consolas, monospace;
+      background: #edf2ee;
+      padding: 8px 10px;
+      border-radius: 8px;
+      display: inline-block;
+      margin-top: 12px;
+      font-size: 0.9rem;
+    }
+    .method-list {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #eef4f8;
+      color: var(--blue);
+      font-size: 0.74rem;
+      font-weight: 700;
+    }
+    .tag.orange { background: #fff2e3; color: var(--orange); }
+    .tag.red { background: #fdeae8; color: var(--red); }
+    .tag.green { background: var(--green-soft); color: var(--green-dark); }
+    pre {
+      margin: 18px 0 0;
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.83rem;
+      line-height: 1.5;
+    }
+    @media (max-width: 820px) {
+      .grid { grid-template-columns: 1fr; }
+      .header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>OpenTelemetry Method Test Page</h1>
+      <a class="link-btn" href="/">Back to Playground</a>
+    </div>
+
+    <div class="grid">
+      <aside class="panel sidebar">
+        <h2>Methods</h2>
+        <label for="custom-input" style="display:block; margin: 14px 0 8px; font-weight:700;">Custom input</label>
+        <input id="custom-input" type="text" value="What is OpenTelemetry?" style="width:100%; padding:10px 12px; border:1px solid #dfe8e1; border-radius:8px; margin-bottom:16px; font-size:0.96rem;" />
+        <div class="methods" id="method-buttons">
+          <button class="method-btn primary" data-method="all">Run all methods</button>
+          <button class="method-btn" data-method="resource">Resource.create</button>
+          <button class="method-btn" data-method="tracerprovider">TracerProvider</button>
+          <button class="method-btn" data-method="spanprocessor">BatchSpanProcessor</button>
+          <button class="method-btn" data-method="start_as_current_span">start_as_current_span</button>
+          <button class="method-btn" data-method="set_attribute">set_attribute</button>
+          <button class="method-btn" data-method="add_event">add_event</button>
+          <button class="method-btn" data-method="get_span_context">get_span_context</button>
+          <button class="method-btn" data-method="record_exception">record_exception</button>
+          <button class="method-btn" data-method="set_status">set_status</button>
+        </div>
+      </aside>
+
+      <main class="panel content">
+        <div class="result-box" id="result-box">
+          <div class="status">READY</div>
+          <h3>Click a method to generate a trace</h3>
+          <p>Each action emits spans that are exported to Jaeger through OTLP.</p>
+          <p>Use the Jaeger UI at <a href="http://localhost:16686" target="_blank" rel="noreferrer">localhost:16686</a> and search for service <strong>simple-llm-demo</strong>.</p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const resultBox = document.getElementById('result-box');
+    const methodButtons = document.querySelectorAll('.method-btn');
+
+    function escapeHtml(value = '') {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderResult(data, error = null) {
+      if (error) {
+        resultBox.innerHTML = `
+          <div class="status error">ERROR</div>
+          <h3>Failed</h3>
+          <p>${error}</p>
+        `;
+        return;
+      }
+
+      const methodList = (data.methods || []).map((m) => `<span class="tag green">${m}</span>`).join('');
+      const details = data.method_details || {};
+      const trigger = escapeHtml(details.trigger || 'POST /methods/demo -> run_otel_method_demo(method_name, custom_input)');
+      const backendCode = escapeHtml(details.backend_code || 'with local_tracer.start_as_current_span("otel.methods.demo") as root:');
+      const otelCalls = (details.otel_calls || []).map((call) => `<li>${escapeHtml(call)}</li>`).join('');
+
+      resultBox.innerHTML = `
+        <div class="status">SUCCESS</div>
+        <h3>Method: ${escapeHtml(data.method || 'unknown')}</h3>
+        <p>${escapeHtml(data.message || 'OpenTelemetry method executed successfully.')}</p>
+        <div class="method-list">${methodList}</div>
+        <div class="trace-id">Trace ID: ${escapeHtml(data.trace_id || 'n/a')}</div>
+
+        <div style="margin-top: 16px; border: 1px solid #dfe8e1; border-radius: 10px; background: #f8fbf8; padding: 14px;">
+          <h4 style="margin: 0 0 10px;">What this method is calling</h4>
+          <p style="margin: 0 0 8px;"><strong>Trigger:</strong> ${trigger}</p>
+          <p style="margin: 0 0 8px;"><strong>Backend code:</strong></p>
+          <pre style="margin: 0 0 12px;">${backendCode}</pre>
+          <p style="margin: 0 0 8px;"><strong>OpenTelemetry calls:</strong></p>
+          <ul style="margin: 0; padding-left: 18px; line-height: 1.7;">${otelCalls}</ul>
+        </div>
+
+        <pre>Open Jaeger and search for service "simple-llm-demo" to inspect the trace.</pre>
+      `;
+    }
+
+    methodButtons.forEach((button) => {
+      button.addEventListener('click', async () => {
+        const method = button.dataset.method;
+        const customInput = document.getElementById('custom-input').value.trim() || 'OpenTelemetry tracing demo';
+        resultBox.innerHTML = `
+          <div class="status">RUNNING</div>
+          <h3>Executing ${method}...</h3>
+          <p>Sending OTLP span data to Jaeger with input: "${customInput}"</p>
+        `;
+
+        try {
+          const response = await fetch('/methods/demo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ method, input: customInput })
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+            renderResult(null, data.error || 'Method execution failed.');
+            return;
+          }
+          renderResult(data);
+        } catch (err) {
+          renderResult(null, err.message || 'Unexpected error while testing the method.');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

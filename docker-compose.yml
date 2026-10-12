@@ -1,0 +1,27 @@
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.62.0
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+
+  app:
+    build: .
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
+    ports:
+      - "8000:8000"
+    depends_on:
+      - jaeger
+
+  app-console:
+    build: .
+    environment:
+      OTEL_EXPORTER_MODE: console
+      PORT: "8001"
+    ports:
+      - "8001:8001"
+    command: python app.py
